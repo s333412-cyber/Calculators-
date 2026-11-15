@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年終獎金計算器</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    background: linear-gradient(135deg, #eaf3fb 0%, #d6e8f7 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(30, 90, 160, 0.15);
+    padding: 32px 28px;
+  }
+
+  h1 {
+    font-size: 24px;
+    color: #1a5cab;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px 12px;
+    border: 1px solid #b8cfe4;
+    border-radius: 8px;
+    color: #2c3e50;
+    background: #f7fafe;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: #1a5cab;
+    box-shadow: 0 0 0 3px rgba(26, 92, 171, 0.15);
+  }
+
+  input.invalid {
+    border-color: #d9534f;
+  }
+
+  .error {
+    color: #d9534f;
+    font-size: 16px;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .error.show {
+    display: block;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  button {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+
+  #calcBtn {
+    background: #1a5cab;
+    color: #ffffff;
+  }
+
+  #calcBtn:hover {
+    background: #154a8c;
+  }
+
+  #clearBtn {
+    background: #e8f1fa;
+    color: #1a5cab;
+    border: 1px solid #b8cfe4;
+  }
+
+  #clearBtn:hover {
+    background: #d6e8f7;
+  }
+
+  .result {
+    margin-top: 24px;
+    background: #f0f7ff;
+    border: 1px solid #b8cfe4;
+    border-radius: 8px;
+    padding: 16px;
+    display: none;
+  }
+
+  .result.show {
+    display: block;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 16px;
+  }
+
+  .result-row .label {
+    color: #4a6580;
+  }
+
+  .result-row .value {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .result-row.total {
+    border-top: 1px solid #b8cfe4;
+    margin-top: 8px;
+    padding-top: 12px;
+    font-size: 18px;
+  }
+
+  .result-row.total .value {
+    color: #1a5cab;
+    font-size: 22px;
+  }
+
+  @media (max-width: 480px) {
+    .card {
+      padding: 24px 18px;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    .buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+  <meta property="og:image" content="https://bolt.new/static/og_default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+</head>
+<body>
+  <main class="card">
+    <h1>年終獎金計算器</h1>
+
+    <div class="field">
+      <label for="name">姓名（選填）</label>
+      <input type="text" id="name" placeholder="請輸入姓名">
+    </div>
+
+    <div class="field">
+      <label for="salary">基本薪資（元）</label>
+      <input type="number" id="salary" placeholder="請輸入基本薪資" min="0" step="any">
+      <p class="error" id="salaryError">基本薪資必須大於 0</p>
+    </div>
+
+    <div class="field">
+      <label for="rating">考績</label>
+      <select id="rating">
+        <option value="A">A（4 個月）</option>
+        <option value="B">B（3 個月）</option>
+        <option value="C">C（2 個月）</option>
+        <option value="D">D（1 個月）</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="years">年資（年）</label>
+      <input type="number" id="years" placeholder="請輸入年資" min="0" step="1">
+      <p class="error" id="yearsError">年資必須是 0 以上的整數</p>
+    </div>
+
+    <div class="buttons">
+      <button type="button" id="calcBtn">計算</button>
+      <button type="button" id="clearBtn">清除</button>
+    </div>
+
+    <section class="result" id="result" aria-live="polite">
+      <div class="result-row">
+        <span class="label">考績月數</span>
+        <span class="value" id="rMonths"></span>
+      </div>
+      <div class="result-row">
+        <span class="label">年資加成（月）</span>
+        <span class="value" id="rBonus"></span>
+      </div>
+      <div class="result-row">
+        <span class="label">總月數</span>
+        <span class="value" id="rTotal"></span>
+      </div>
+      <div class="result-row total">
+        <span class="label">年終獎金</span>
+        <span class="value" id="rAmount"></span>
+      </div>
+    </section>
+  </main>
+
+<script>
+(function () {
+  var RATING_MONTHS = { A: 4, B: 3, C: 2, D: 1 };
+
+  var nameInput = document.getElementById("name");
+  var salaryInput = document.getElementById("salary");
+  var ratingSelect = document.getElementById("rating");
+  var yearsInput = document.getElementById("years");
+  var salaryError = document.getElementById("salaryError");
+  var yearsError = document.getElementById("yearsError");
+  var resultBox = document.getElementById("result");
+
+  function formatNumber(n) {
+    return n.toLocaleString("zh-Hant-TW", { maximumFractionDigits: 0 });
+  }
+
+  function showError(input, errorEl, show) {
+    if (show) {
+      input.classList.add("invalid");
+      errorEl.classList.add("show");
+    } else {
+      input.classList.remove("invalid");
+      errorEl.classList.remove("show");
+    }
+  }
+
+  function validate() {
+    var salary = Number(salaryInput.value);
+    var years = Number(yearsInput.value);
+    var salaryOk = salaryInput.value !== "" && salary > 0;
+    var yearsOk = yearsInput.value !== "" && Number.isInteger(years) && years >= 0;
+
+    showError(salaryInput, salaryError, !salaryOk);
+    showError(yearsInput, yearsError, !yearsOk);
+    return salaryOk && yearsOk;
+  }
+
+  salaryInput.addEventListener("input", function () {
+    if (salaryError.classList.contains("show")) validate();
+  });
+  yearsInput.addEventListener("input", function () {
+    if (yearsError.classList.contains("show")) validate();
+  });
+
+  document.getElementById("calcBtn").addEventListener("click", function () {
+    if (!validate()) {
+      resultBox.classList.remove("show");
+      return;
+    }
+    var salary = Number(salaryInput.value);
+    var years = Number(yearsInput.value);
+    var months = RATING_MONTHS[ratingSelect.value];
+    var seniorityBonus = years * 0.1;
+    var totalMonths = months + seniorityBonus;
+    var bonus = Math.round(salary * totalMonths);
+
+    document.getElementById("rMonths").textContent = months + " 個月";
+    document.getElementById("rBonus").textContent = seniorityBonus.toFixed(1) + " 個月";
+    document.getElementById("rTotal").textContent = totalMonths.toFixed(1) + " 個月";
+    document.getElementById("rAmount").textContent = formatNumber(bonus) + " 元";
+    resultBox.classList.add("show");
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function () {
+    nameInput.value = "";
+    salaryInput.value = "";
+    ratingSelect.value = "A";
+    yearsInput.value = "";
+    salaryInput.classList.remove("invalid");
+    yearsInput.classList.remove("invalid");
+    salaryError.classList.remove("show");
+    yearsError.classList.remove("show");
+    resultBox.classList.remove("show");
+  });
+})();
+</script>
+</body>
+</html>
